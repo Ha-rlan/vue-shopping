@@ -4,16 +4,18 @@
       <img src="../images/logo.jpg" alt="logo" class="logo">
     </el-form-item>
     <el-form-item class="input-group">
-      <el-input v-model="register_form.account" placeholder="请输入账号" type="text" show-word-limit minlength="6" maxlength="16"></el-input>
+      <el-input v-model="register_form.username" placeholder="请输入账号" type="text" show-word-limit minlength="6" maxlength="16"></el-input>
     </el-form-item>
     <el-form-item class="input-group">
       <el-input show-password v-model="register_form.password" placeholder="请输入密码" type="password" minlength="6" maxlength="16"></el-input>
     </el-form-item>
-    <el-form-item class="input-check">
-      <el-input type="text" placeholder="请输入手机号码" v-model="register_form.phone"></el-input>
+    <el-form-item class="input-check" prop="email" :rules="{
+      required: true,message:'请输入邮箱地址',trigger:'blur'
+}">
+      <el-input type="text" v-model="register_form.email" placeholder="请输入邮箱地址"></el-input>
     </el-form-item>
     <el-form-item>
-      <el-input type="text" placeholder="请输入验证码" v-model="register_form.code" minlength="6" class="code"></el-input>
+      <el-input type="text" placeholder="请输入验证码" v-model="register_form.check_code" minlength="6" class="code"></el-input>
       <el-button type="info" round @click="send_code" class="code_button">发送验证码</el-button>
     </el-form-item>
     <el-form-item>
@@ -28,18 +30,29 @@ export default {
   data(){
     return{
       register_form:{
-        account: "",
+        username: "",
         password:"",
-        phone:null,
-        code:""
+        email:null,
+        check_code:"",
       }
     }
   },
   methods:{
     send_code(){
-
+      let data = this.$qs.stringify(this.register_form);
+      this.$http.post("/mail",data)
+      .then(res => console.log(res))
+      .catch(reason => console.log(reason))
     },
-    register(){
+    async register(){
+      let data = this.$qs.stringify(this.register_form);
+      let {data:res} = await this.$http.post("/register",data);
+      console.log(res)
+      if(res == true){
+        await this.$router.replace("/login")
+      }else {
+        this.$message.error("验证码错误，请重新验证")
+      }
 
     }
   }
