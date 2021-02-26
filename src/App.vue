@@ -5,6 +5,7 @@
 </template>
 
 <style>
+@import "assets/iconfont.css";
 #app{
   height: 100%;
 }

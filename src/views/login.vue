@@ -36,8 +36,8 @@ export default {
   },
   methods:{
       async login() {
-      let data = this.$qs.stringify(this.form);
-      let {data:res} = await this.$http.post("login", data);
+        let data = this.$qs.stringify(this.form)
+      let {data:res} = await this.$http.post("login",data);
       if(res == true){
         await this.$router.replace("/home");
         this.$message({

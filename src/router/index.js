@@ -22,8 +22,20 @@ const routes = [
   },
   {
     path: "/home",
-    component: ()=>import("../views/home.vue")
-  }
+    component: ()=>import("../views/home.vue"),
+    redirect: "/welcome",
+    // child router ,notice the child is a array
+    children:[
+        {
+      path:"/welcome",
+      component: ()=>import("../views/welcome.vue")
+    },
+      {
+        path: "/Manager",
+        component: ()=>import("../components/user/users.vue")
+      }
+    ]
+  },
 ]
 
 const router = new VueRouter({
