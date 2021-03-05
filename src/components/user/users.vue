@@ -52,7 +52,7 @@
 <!--            distribute-->
 
             <el-tooltip effect="dark" content="分配角色" placement="top" :enterable="false">
-              <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
+              <el-button type="warning" icon="el-icon-setting" size="mini" @click="setRole(scope.row)"></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -121,6 +121,29 @@
       <span slot="footer" class="dialog-footer">
     <el-button @click="editDialogVisible = false">取 消</el-button>
     <el-button type="primary" @click="editUserInfo()">确 定</el-button>
+  </span>
+    </el-dialog>
+
+<!--    distribute role-->
+
+    <el-dialog title="分配角色" :visible.sync="distributeRoleDialogVisible" width="50%">
+      <div>
+        <p>当前用户：{{userInfo.name}}</p>
+        <p>当前角色: {{userInfo.role_name}}</p>
+        <p>分配新角色：
+          <el-select v-model="selectedRoleId" placeholder="请选择角色">
+            <el-option
+                v-for="item in rolesList"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+            </el-option>
+          </el-select>
+        </p>
+      </div>
+      <span slot="footer" class="dialog-footer">
+    <el-button @click="distributeRoleDialogVisible = false">取 消</el-button>
+    <el-button type="primary" @click="saveRoleInfo">确 定</el-button>
   </span>
     </el-dialog>
   </div>
@@ -205,6 +228,14 @@ export default {
           {validator:checkPhone,trigger: "blur"}
             ]
       },
+      // control the visible of distribute role
+      distributeRoleDialogVisible:false,
+      //distribute Role of user object
+      userInfo:{},
+      //all of role
+      rolesList:[],
+      // selected of role id
+      selectedRoleId:"",
     }
   },
 
@@ -312,6 +343,35 @@ export default {
       }).catch(() =>{
         this.$message.info("已取消删除")
       })
+    },
+    // show the distribute dialog
+    async setRole(role){
+      this.userInfo = role;
+      //get the role list
+      let res = await this.$http.get("Role");
+      if(res.status == 200){
+        this.$message.success("获取角色列表成功");
+        this.rolesList = res.data;
+      }else {
+        this.$message.error("获取角色列表失败")
+      }
+      this.distributeRoleDialogVisible = true;
+    },
+    // distribute role
+    async saveRoleInfo(){
+      if(!this.selectedRoleId){
+        this.$message.error("请选择要分配的角色！");
+      }else {
+       let res =  await this.$http.put("addRole?role_id="+this.selectedRoleId+"&id="+this.userInfo.id)
+        this.selectedRoleId="";
+        if(res.status == 200){
+          this.$message.success("添加用户角色成功");
+          await this.getUserList();
+          this.distributeRoleDialogVisible = false;
+        }else {
+          this.$message.error("添加用户角色失败");
+        }
+      }
     }
 
   }

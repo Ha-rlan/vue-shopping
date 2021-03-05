@@ -8,6 +8,7 @@
 @import "assets/iconfont.css";
 #app{
   height: 100%;
+  min-width: 1366px;
 }
 html{
   height: 100%;
